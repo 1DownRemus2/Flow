@@ -23,6 +23,9 @@ export const signup = (email, password) =>
 export const login = (email, password) =>
   api.post('/auth/login', { email, password });
 
+export const googleLogin = (credential) =>
+  api.post('/auth/google', { credential });
+
 // PERIOD LOG FUNCTIONS
 export const getPeriods = () => api.get('/periods');
 export const getPredictions = () => api.get('/periods/predictions');

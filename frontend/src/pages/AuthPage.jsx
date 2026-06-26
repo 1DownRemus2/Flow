@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { signup, login } from '../api';
+import { GoogleLogin } from '@react-oauth/google';
+import { signup, login, googleLogin } from '../api';
 
 function AuthPage({ onAuthSuccess }) {
   const [isLogin, setIsLogin] = useState(true);
@@ -24,6 +25,22 @@ function AuthPage({ onAuthSuccess }) {
     } catch (err) {
       const message = err.response?.data?.error || 'Something went wrong. Try again.';
       setError(message);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleGoogleSuccess = async (credentialResponse) => {
+    setError('');
+    setSubmitting(true);
+
+    try {
+      const response = await googleLogin(credentialResponse.credential);
+      const { token, user } = response.data;
+      localStorage.setItem('token', token);
+      onAuthSuccess(user);
+    } catch (err) {
+      setError('Google sign-in failed. Try again.');
     } finally {
       setSubmitting(false);
     }
@@ -67,6 +84,19 @@ function AuthPage({ onAuthSuccess }) {
             {submitting ? 'Please wait…' : isLogin ? 'Log in' : 'Create account'}
           </button>
         </form>
+
+        <div style={styles.divider}>
+          <span style={styles.dividerLine} />
+          <span style={styles.dividerText}>OR</span>
+          <span style={styles.dividerLine} />
+        </div>
+
+        <div style={styles.googleButtonWrap}>
+          <GoogleLogin
+            onSuccess={handleGoogleSuccess}
+            onError={() => setError('Google sign-in failed. Try again.')}
+          />
+        </div>
 
         <p style={styles.switchText}>
           {isLogin ? "Don't have an account?" : 'Already have an account?'}{' '}
@@ -167,6 +197,27 @@ const styles = {
     fontSize: '14px',
     fontWeight: 600,
     cursor: 'pointer',
+  },
+  divider: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px',
+    margin: '22px 0',
+  },
+  dividerLine: {
+    flex: 1,
+    height: '1px',
+    background: 'var(--border)',
+  },
+  dividerText: {
+    fontSize: '11px',
+    fontWeight: 600,
+    color: 'var(--ink-faint)',
+    letterSpacing: '0.05em',
+  },
+  googleButtonWrap: {
+    display: 'flex',
+    justifyContent: 'center',
   },
   switchText: {
     marginTop: '24px',

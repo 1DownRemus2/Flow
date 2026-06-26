@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 import AuthPage from './pages/AuthPage';
 import Dashboard from './pages/Dashboard';
 
@@ -31,15 +32,16 @@ function App() {
     return <p>Loading...</p>;
   }
 
-  return (
-    <div>
-      {user ? (
-        <Dashboard onLogout={handleLogout} />
-      ) : (
-        <AuthPage onAuthSuccess={handleAuthSuccess} />
-      )}
-    </div>
+ return (
+    <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
+      <div>
+        {user ? (
+          <Dashboard onLogout={handleLogout} />
+        ) : (
+          <AuthPage onAuthSuccess={handleAuthSuccess} />
+        )}
+      </div>
+    </GoogleOAuthProvider>
   );
 }
-
 export default App;
